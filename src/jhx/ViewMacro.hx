@@ -28,8 +28,18 @@ class ViewMacro
 			{
 				if (meta.name == META_TEMPLATE)
 				{
-					var field = addTemplateAndGenerateField(meta.params);
+					var field:Field;
+					
+					var templateId = addTemplateResource(meta.params[0]);
+					field = createTemplateIdField(templateId);
 					fields.push(field);
+
+
+					if(meta.params.length > 1)
+					{
+						field = createContainerSelectorField(meta.params[1]);
+						fields.push(field);
+					}
 				}
 			}
 		}
@@ -37,22 +47,9 @@ class ViewMacro
 		return fields;
 	}
 
-	// static function createClassNameField(className:String):Field
-	// {
-	// 	var field = TPath({ pack : [], name : "String", params : [], sub : null });
-
-	// 	var fieldValue : Expr = {
-	// 		expr : EConst(CString(className)), 
-	// 		pos : Context.currentPos()
-	// 	};
-
-
-	// 	return { name : "_className", doc : null, meta : [], access : [APrivate], kind : FVar(field,fieldValue), pos : Context.currentPos() };
-	// }
-
-	static function addTemplateAndGenerateField(params : Array<Expr>):Field
+	static function addTemplateResource(fileExpr : Expr):String
 	{
-		var file = getFilePath(params[0]);
+		var file = getFilePath(fileExpr);
 
 		var content = sys.io.File.getContent(file);
 
@@ -62,6 +59,12 @@ class ViewMacro
 
 		Context.addResource(templateId, bytes);
 
+		return templateId;
+
+	}
+
+	static function createTemplateIdField(templateId:String):Field
+	{
 		var field = TPath({ pack : [], name : "String", params : [], sub : null });
 
 		var pos = Context.currentPos();
@@ -74,21 +77,28 @@ class ViewMacro
 		return { name : "templateId", doc : null, meta : [], access : [APublic], kind : FVar(field,fieldValue), pos : pos };
 	}
 
-	static function getFilePath( fileName : Expr ):String
+	static function createContainerSelectorField(pathExpr:Expr):Field
 	{
-		var fileStr = null;
-		switch( fileName.expr )
-		{
-		case EConst(c):
-			switch( c ){
-			case CString(s): fileStr = s;
-			default:
-			}
-		default:
-		};
-		if ( fileStr == null )
-			Context.error("Constant string expected",fileName.pos);
+		var selectorStr = getString(pathExpr);
 
+		var field = TPath({ pack : [], name : "String", params : [], sub : null });
+
+		var pos = Context.currentPos();
+
+		var fieldValue : Expr = {
+			expr : EConst(CString(selectorStr)), 
+			pos : pos
+		};
+
+		return { name : "containerSelector", doc : null, meta : [], access : [APublic], kind : FVar(field,fieldValue), pos : pos };
+
+	}
+
+	// ------------------------------------------------------------------------- common
+
+	static function getFilePath( fileNameExpr : Expr ):String
+	{
+		var fileStr = getString(fileNameExpr);
 		try
 		{
 			var file = Context.resolvePath(fileStr);
@@ -100,6 +110,25 @@ class ViewMacro
 		}
 
 		return null;
+	}
+
+	static function getString(expr:Expr):String
+	{
+
+		var str = null;
+		switch( expr.expr )
+		{
+		case EConst(c):
+			switch( c ){
+			case CString(s): str = s;
+			default:
+			}
+		default:
+		};
+		if ( str == null )
+			Context.error("Constant string expected",expr.pos);
+
+		return str;
 	}
 }
 

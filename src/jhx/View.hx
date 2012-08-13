@@ -107,7 +107,14 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 	 * Container element for children (defaults to same as view.element)
 	 */
 	public var container(get_container, null):JQuery;
-	function get_container():JQuery {return getChildContainer();}
+	function get_container():JQuery {
+		if(Reflect.hasField(this, "containerSelector"))
+		{
+
+			return element.find(Reflect.field(this, "containerSelector"));
+		}
+		return element;
+	}
 
 	var className(default, null):String;
 
@@ -144,6 +151,7 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 
 
 	//-------------------------------------------------------------------------- core
+
 	/**
 	 * Dispatch an event, returning `true` if the event should continue to bubble, 
 	 * and `false` if not.
@@ -154,9 +162,6 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 		return true;
 	}
 
-
-
-	
 	/**
 	 * Sets the data property and triggers a DATA_CHANGED event
 	 * @param data 	data to set
@@ -412,11 +417,11 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 		render();
 	}
 
-	function getChildContainer():JQuery
-	{
-		return element;
-	}
-
+	/**
+	 * Called during validation to regenerate html from template, updating innerHTML if modified.
+	 * 
+	 * @see validate()
+	 */
 	function render()
 	{
 		var temp = template.execute(this);
@@ -433,6 +438,11 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 		}
 	}
 
+	/**
+	 * Recusively adds all children, dispatching 'Added' events
+	 * 
+	 * @see addChild()
+	 */
 	function added()
 	{
 		for(child in children)
@@ -443,6 +453,11 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 		event.bubbleType(Added);
 	}
 
+	/**
+	 * recursively removes all children, dispatching 'Removed' events
+	 *
+	 * @see removeChild();
+	 */
 	function removed()
 	{
 		for(child in children)

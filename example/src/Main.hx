@@ -25,7 +25,7 @@ class Main
 }
 
 
-@template("../template/root.html")
+@template("../template/root.html", "ul")
 class RootView extends ViewRoot
 {
 	public var toggled:Bool;
@@ -48,11 +48,6 @@ class RootView extends ViewRoot
 			untyped console.log(view, toggled);
 			child.setData(toggled);
 		}
-	}
-
-	override function getChildContainer()
-	{
-		return element.children("ul");
 	}
 }
 
