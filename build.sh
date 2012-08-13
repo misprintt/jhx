@@ -13,5 +13,5 @@ haxe build.hxml
 
 cp -rf example/resource/ bin/example/
 
-# osascript refreshChrome.scpt
+osascript refreshChrome.scpt
 

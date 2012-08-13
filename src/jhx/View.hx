@@ -106,12 +106,16 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 	/**
 	 * Container element for children (defaults to same as view.element)
 	 */
-	var container:JQuery;
+	public var container(get_container, null):JQuery;
+	function get_container():JQuery {return getChildContainer();}
 
 	var className(default, null):String;
 
 	var changeHandlers:Hash<Array<Event<DataView<TData>, ViewEventType> -> Void>>;
 
+	var template:haxe.Template;
+	
+	public var html(default, null):String;
 
 	
 	public function new(?data:TData=null, ?element:JQuery=null)
@@ -163,8 +167,8 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 		if(this.data != data || force == true)
 		{
 			previousData = this.data;
-			this.data = data;
-			trigger("data");
+			data = set("data", data, force);
+			validate();
 		}
 	}
 
@@ -250,16 +254,14 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 			var previous = Reflect.field(previousValues, field);
 			var current = Reflect.field(this, field);
 
-			if(previous != current)
-			{
-				changed = true;
-				trigger(field);
-			}
+			changed = true;
+			trigger(field);
 		}
 
 		if(changed)
 		{
 			previousValues = {};
+			render();
 			trigger("all");
 		}
 	}
@@ -324,7 +326,7 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 
 	
 
-	public function set<TValue>(name:String, value:TValue):TValue
+	public function set<TValue>(name:String, value:TValue, ?force:Bool=false):TValue
 	{
 		//Console.assert(Reflect.hasField(this, name), className + "." + name + " does not exist.");
 		// Console.assert(Type.typeof(Reflect.field(this, name)) == Type.typeof(value), className + "." + name + " is not of type " + Std.string(Type.typeof(value)));
@@ -332,11 +334,11 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 		var current:TValue = Reflect.field(this, name);
 		var previous:TValue = Reflect.hasField(previousValues, name) ? Reflect.field(previousValues, name) : null;
 
-		if(current == value)
+		if(current == value  && !force)
 		{
 			//do nothing
 		}
-		else if(previous == value)
+		else if(previous == value && !force)
 		{
 			//restore original value;
 			Reflect.setField(this, name, value);
@@ -395,13 +397,39 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 			element.attr("id", id);
 		}
 
-		container = element;
 		element.addClass(className);
 
 		if(Reflect.hasField(this, "templateId"))
 		{
-			var resource = haxe.Resource.getString(Reflect.field(this, "templateId"));
-			element.html(resource);
+			var templateContent = haxe.Resource.getString(Reflect.field(this, "templateId"));
+			template = new haxe.Template(templateContent);
+		}
+		else
+		{
+			template = new haxe.Template("");
+		}
+
+		render();
+	}
+
+	function getChildContainer():JQuery
+	{
+		return element;
+	}
+
+	function render()
+	{
+		var temp = template.execute(this);
+
+		if(temp != html && temp != "")
+		{
+			html = temp;
+			element.html(html);
+
+			for(child in children)
+			{
+				container.append(child.element);
+			}
 		}
 	}
 

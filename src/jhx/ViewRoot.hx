@@ -13,6 +13,6 @@ class ViewRoot extends View
 	override function initialize()
 	{
 		super.initialize();
-		container = new JQuery("body");
+		
 	}
 }
