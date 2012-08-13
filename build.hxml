@@ -1,0 +1,6 @@
+-cp src
+-cp example/src
+-main Main
+-js bin/example/main.js
+-lib mconsole
+-lib msignal

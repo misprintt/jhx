@@ -1,0 +1,14 @@
+
+# JavaScript
+-main TestMain
+-lib munit
+-lib hamcrest
+-cp src
+
+-cp test
+-js bin/test/js_test.js
+
+-lib mconsole
+-lib msignal
+
+-debug

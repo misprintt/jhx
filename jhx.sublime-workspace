@@ -1,0 +1,292 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"chi",
+				"childInstance"
+			],
+			[
+				"child",
+				"childInstance2"
+			],
+			[
+				"ex",
+				"exceptionThrown"
+			],
+			[
+				"Mock",
+				"MockView	class"
+			],
+			[
+				"data",
+				"dataChanged"
+			],
+			[
+				"Val",
+				"ValidatableItem	class"
+			],
+			[
+				"temp",
+				"templateURL"
+			],
+			[
+				"te",
+				"templateURL"
+			],
+			[
+				"dis",
+				"dispatch(...)	Void"
+			],
+			[
+				"dispatc",
+				"dispatchType(...)	Void"
+			],
+			[
+				"init",
+				"initialValues"
+			],
+			[
+				"ini",
+				"initialValues"
+			],
+			[
+				"in",
+				"initialValues"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "jhx",
+	"command_palette":
+	{
+		"height": 167.0,
+		"selected_items":
+		[
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/dominic/ws/jhx/test/TestMain.hx",
+		"/Users/dominic/ws/jhx/src/jhx/View.hx",
+		"/Users/dominic/ws/jhx/test.hxml",
+		"/Users/dominic/ws/jhx/src/jhx/ViewRoot.hx",
+		"/Users/dominic/ws/jhx/src/jhx/ViewMacro.hx",
+		"/Users/dominic/ws/jhx/src/jhx/Validator.hx",
+		"/Users/dominic/ws/jhx/test/jhx/DataViewTest.hx",
+		"/Users/dominic/ws/jhx_git/jhx.sublime-project",
+		"/Users/dominic/ws/jhx/test/jhx/ValidatorTest.hx",
+		"/Users/dominic/ws/jhx/src/jhx/Validatable.hx",
+		"/Users/dominic/ws/jhx/build.sh",
+		"/Users/dominic/ws/jhx/test/ExampleTest.hx",
+		"/Users/dominic/ws/jhx/ref/DataView.hx",
+		"/Users/dominic/ws/jhx/ref/TemplateDataView.hx",
+		"/Users/dominic/ws/jhx/ref/View.hx",
+		"/Users/dominic/ws/jhx/example/src/Main.hx",
+		"/Users/dominic/ws/jhx/example/resource/template/root.html",
+		"/Users/dominic/ws/jhx/jhx.sublime-project",
+		"/Users/dominic/ws/jhx/src/jhx/DataView.hx",
+		"/Users/dominic/ws/jhx/.munit",
+		"/Users/dominic/ws/jhx/build.hxml",
+		"/Users/dominic/ws/jhx/bin/main.js",
+		"/Users/dominic/ws/jhx/resource/index.html",
+		"/Users/dominic/ws/jhx/jhx.sublime-workspace",
+		"/Users/dominic/ws/jhx/src/jhx/Bindable.hx",
+		"/Users/dominic/ws/jhx/example/Main.hx",
+		"/Users/dominic/Library/Application Support/Sublime Text 2/Packages/User/Default (OSX).sublime-keymap",
+		"/Users/dominic/Library/Application Support/Sublime Text 2/Packages/Default/Default (OSX).sublime-keymap",
+		"/Users/dominic/Desktop/js/bin/index.html",
+		"/Users/dominic/Desktop/js/build.hxml",
+		"/Users/dominic/Desktop/js/build.sh",
+		"/Users/dominic/ws/MassiveUnit2/tool/gui/refreshChrome.scpt",
+		"/Users/dominic/ws/MassiveUnit2/tool/gui/build_osx.sh",
+		"/Users/dominic/ws/haxelib/install.sh",
+		"/Users/dominic/ws/haxelib/docs/haxelib.xml",
+		"/Users/dominic/ws/haxelib/docs/Lib.md",
+		"/Users/dominic/ws/haxelib/README.md",
+		"/Users/dominic/ws/haxelib/Main.hx",
+		"/Users/dominic/ws/MassiveCore/build.sh",
+		"/Users/dominic/ws/MassiveTask/src/lib/Build.hx",
+		"/Users/dominic/ws/MassiveTask/src/runner/Build.hx",
+		"/Users/dominic/ws/MassiveTask/src/task/Build.hx",
+		"/Users/dominic/ws/MassiveTask/src/task/install.hxml",
+		"/Users/dominic/ws/MassiveTask/src/runner/build.hxml",
+		"/Users/dominic/ws/MassiveTask/src/runner/run.n",
+		"/Users/dominic/ws/MassiveTask/src/lib/mtask/target/HaxeServer.hx",
+		"/Users/dominic/ws/MassiveTask/src/install/mtask.zip",
+		"/Users/dominic/ws/mpartial/src/example/basic/src/example/Display.hx",
+		"/Users/dominic/ws/mpartial/src/lib/mpartial/util/ClassUtil.hx",
+		"/Users/dominic/ws/mpartial/src/example/basic/build.hxml",
+		"/Users/dominic/ws/mpartial/src/example/basic/build_manual.hxml",
+		"/Users/dominic/ws/mpartial/src/example/basic/build-local.hxml",
+		"/Users/dominic/ws/mpartial/src/example/basic/src/example/Display_js.hx",
+		"/Users/dominic/ws/mpartial/src/example/basic/gen-partials/mpartial.log"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"Changed",
+			"PropertyChanged",
+			"Validated",
+			"var instance",
+			"tagName",
+			"container",
+			"classN",
+			"className",
+			"container",
+			"initialize",
+			"if(",
+			"signal",
+			"ViewEvent",
+			"signal",
+			"properties",
+			"_properties",
+			"propertyValues",
+			"initialValues",
+			"getRepository",
+			"compileRunner"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"ChangedProperty",
+			"Changed",
+			"instance",
+			"if (",
+			"ViewEventType",
+			"event",
+			"previousValues",
+			"properties",
+			"_properties",
+			"propertyValues"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.549233337656,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 143.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 234.0,
+	"status_bar_visible": true
+}

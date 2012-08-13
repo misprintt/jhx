@@ -1,0 +1,27 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"build_systems":
+	[
+		{
+			"cmd":
+			[
+				"bash",
+				"build.sh"
+			],
+			"name": "jhx",
+			"working_dir": "${project_path:${folder}}"
+		}
+	],
+	"settings":
+	{
+		"rulers":
+		[
+			80
+		]
+	}
+}
