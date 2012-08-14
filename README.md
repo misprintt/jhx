@@ -5,6 +5,7 @@ A Haxe JavaScript View Framework
 
 View component that composes a JQuery element and a typed data property.
 
+
 Features:
 
 * html layout templates (via metadata)
@@ -14,6 +15,7 @@ Features:
 * lifecycle (initialize, added, render, removed, destroy )
 
 
+> **Please Note:"** This is a work in progress and is subject to change :)
 
 ### View
 
