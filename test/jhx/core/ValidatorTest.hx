@@ -1,9 +1,9 @@
-package jhx;
+package jhx.core;
 
 import massive.munit.util.Timer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
-import jhx.Validator;
+import jhx.core.Validator;
 
 /**
 * Auto generated MassiveUnit Test Class  for jhx.Validator 

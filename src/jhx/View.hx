@@ -6,7 +6,7 @@ import js.Lib;
 import js.Dom;
 import js.JQuery;
 
-import jhx.Validator;
+import jhx.core.Validator;
 
 typedef AnyView = View<Dynamic>;
 

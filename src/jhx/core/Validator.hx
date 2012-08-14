@@ -1,4 +1,4 @@
-package jhx;
+package jhx.core;
 
 interface Validatable
 {

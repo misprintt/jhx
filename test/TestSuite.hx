@@ -1,6 +1,6 @@
 import massive.munit.TestSuite;
 
-import jhx.ValidatorTest;
+import jhx.core.ValidatorTest;
 import jhx.ViewTest;
 
 /**
@@ -15,7 +15,7 @@ class TestSuite extends massive.munit.TestSuite
 	{
 		super();
 
-		add(jhx.ValidatorTest);
+		add(jhx.core.ValidatorTest);
 		add(jhx.ViewTest);
 	}
 }
