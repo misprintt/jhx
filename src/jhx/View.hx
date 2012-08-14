@@ -7,22 +7,13 @@ import js.Dom;
 import js.JQuery;
 
 import jhx.core.Validator;
+import jhx.core.Bindable;
 
 typedef AnyView = View<Dynamic>;
 
-enum ViewEventType
-{
-	Added;
-	Removed;
-	Actioned;
-	Changed(name:String);
-}
-
-
 @:autoBuild(jhx.ViewMacro.build())
-class View<TData> implements Validatable, implements EventDispatcher<Event<View<TData>, ViewEventType>>
+class View<TData> extends Bindable<View<TData>>
 {
-
 	public static function fromId<T>(data:T, elementId:String):View<T>
 	{
 		var element = Lib.document.getElementById(elementId);
@@ -37,7 +28,6 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 
 	//-------------------------------------------------------------------------- public previousValues
 
-	public var event(default, null):EventSignal<View<TData>, ViewEventType>;
 	
 	/**
 	 * Unique identifier (viewXXX);
@@ -76,18 +66,11 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 	
 
 	static var idCounter:Hash<Int> = new Hash();
-	static var validator:Validator = new Validator();
-
+	
 	/**
 	 * Reference to previous data object
 	 */
 	var previousData:TData;
-
-
-	/**
-	 * Reference to inChanged property values
-	 */
-	var previousValues:Dynamic;
 
 	/**
 	 * Optional tag name to use when creating element via Lib.document.createElement
@@ -120,8 +103,7 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 
 	var className(default, null):String;
 
-	var changeHandlers:Hash<Array<Event<View<TData>, ViewEventType> -> Void>>;
-
+	
 	var template:haxe.Template;
 
 	var containerSelector:String;
@@ -131,18 +113,15 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 	
 	public function new(?data:TData=null, ?element:JQuery=null)
 	{
+		super(this);
+
 		if(element != null)
 			this.element = element;
 
 		className = Type.getClassName(Type.getClass(this)).split(".").pop();
 
-		previousValues = {};
+		
 		children = [];
-
-		event = new EventSignal<View<TData>, ViewEventType>(this);
-
-		changeHandlers = new Hash();
-		event.add(changed).forType(ViewEventType.Changed("all"));
 
 		//set default index without triggering setter
 		Reflect.setField(this, "index", -1);
@@ -155,15 +134,7 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 
 	//-------------------------------------------------------------------------- core
 
-	/**
-	 * Dispatch an event, returning `true` if the event should continue to bubble, 
-	 * and `false` if not.
-	 */
-	public function dispatchEvent(event:Event<View<TData>, ViewEventType>):Bool
-	{
-		this.event.dispatch(event);
-		return true;
-	}
+	
 
 	/**
 	 * Sets the data property and triggers a DATA_CHANGED event
@@ -259,150 +230,7 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 		}
 	}
 
-	//-------------------------------------------------------------------------- validation
-
-	public function validate()
-	{
-		var changed:Bool = false;
-
-		for(field in Reflect.fields(previousValues))
-		{
-			var previous = Reflect.field(previousValues, field);
-			var current = Reflect.field(this, field);
-
-			changed = true;
-			trigger(field);
-		}
-
-		if(changed)
-		{
-			previousValues = {};
-			render();
-			trigger("all");
-		}
-	}
-
-	public function on(type:Dynamic, handler:Event<View<TData>, ViewEventType> -> Void)
-	{
-		if(Std.is(type, String))
-		{
-			if(!changeHandlers.exists(type))
-			{
-				changeHandlers.set(type, []);
-			}
-			else
-			{
-				off(type, handler);
-			}
-			
-			changeHandlers.get(type).push(handler);
-		}
-		else
-		{
-			event.add(handler).forType(type);
-		}
-	}
-
-	public function off(type:Dynamic, handler:Event<View<TData>, ViewEventType> -> Void):Bool
-	{
-		if(Std.is(type, String))
-		{
-			if(changeHandlers.exists(type))
-			{
-				var handlers = changeHandlers.get(type);
-
-				for(i in 0...handlers.length)
-				{
-					var h = handlers[i];
-
-					if(Reflect.compareMethods(h, handler))
-					{
-						handlers.splice(i, 1);
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-		else
-		{
-			event.remove(handler).forType(type);
-			return true;
-		}
-	}
-
-	public function trigger(type:Dynamic)
-	{
-		if(type == null)
-		{
-			event.bubbleType(Changed("all"));
-		}
-
-		else if(Std.is(type, String))
-		{
-			event.bubbleType(Changed(type));
-		}
-		else if(Std.is(type, ViewEventType))
-		{
-			event.bubbleType(type);
-		}
-
-		
-	}
-
-	function changed(event:Event<View<TData>, ViewEventType>)
-	{
-		switch(event.type)
-		{
-			case Changed(field):
-			{
-				if(changeHandlers.exists(field))
-				{
-					var handlers = changeHandlers.get(field).concat([]);
-					for(handler in handlers)
-					{
-						handler(event);
-					}
-				}
-			}
-			default:
-		}
-	}
-
 	
-
-	public function set<TValue>(name:String, value:TValue, ?force:Bool=false):TValue
-	{
-		//Console.assert(Reflect.hasField(this, name), className + "." + name + " does not exist.");
-		// Console.assert(Type.typeof(Reflect.field(this, name)) == Type.typeof(value), className + "." + name + " is not of type " + Std.string(Type.typeof(value)));
-		
-		var current:TValue = Reflect.field(this, name);
-		var previous:TValue = Reflect.hasField(previousValues, name) ? Reflect.field(previousValues, name) : null;
-
-		if(current == value  && !force)
-		{
-			//do nothing
-		}
-		else if(previous == value && !force)
-		{
-			//restore original value;
-			Reflect.setField(this, name, value);
-			Reflect.deleteField(previousValues, name);
-			
-		}
-		else
-		{
-			//value has changed
-			Reflect.setField(previousValues, name, current);
-			Reflect.setField(this, name, value);
-
-			validator.invalidate(this);
-		}
-
-		return value;
-	}
-
-
 	//-------------------------------------------------------------------------- other
 
 	public function toString():String
@@ -411,7 +239,6 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 	}
 
 	//-------------------------------------------------------------------------- lifecycle
-
 
 	function initialize()
 	{
@@ -457,6 +284,11 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 		render();
 	}
 
+	override function validated(flag:Dynamic)
+	{
+		render();
+	}
+
 	/**
 	 * Called during validation to regenerate html from template, updating innerHTML if modified.
 	 * 
@@ -491,7 +323,7 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 			child.added();
 		}
 
-		event.bubbleType(Added);
+		trigger("added");
 	}
 
 	/**
@@ -506,7 +338,7 @@ class View<TData> implements Validatable, implements EventDispatcher<Event<View<
 			child.removed();
 		}
 
-		event.bubbleType(Removed);
+		trigger("removed");
 	}
 
 }

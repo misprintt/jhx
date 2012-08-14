@@ -4,7 +4,7 @@ import massive.munit.util.Timer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import jhx.View;
-
+import jhx.core.Bindable;
 import js.JQuery;
 import js.Lib;
 import js.Dom;
@@ -118,7 +118,7 @@ class ViewTest
 		changed = true;
 		changedValues.push("data");
 		Assert.areEqual(MockView, Type.getClass(event.target));
-		var type = ViewEventType.Changed("data");
+		var type = BindableEventType.Changed("data");
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
@@ -177,7 +177,7 @@ class ViewTest
 		changedValues.push("all");
 
 		Assert.areEqual(MockView, Type.getClass(event.target));
-		var type = ViewEventType.Changed("all");
+		var type = BindableEventType.Changed(null);
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
@@ -198,7 +198,7 @@ class ViewTest
 
 		Assert.areEqual(MockView, Type.getClass(event.target));
 		
-		var type = ViewEventType.Changed("property");
+		var type = BindableEventType.Changed("property");
 		Assert.isTrue(Type.enumEq(type, event.type));
 
 	}
@@ -317,7 +317,7 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, addedHandler, 300);
 		
 		instance = new MockView();
-		instance.event.add(handler).forType(ViewEventType.Added);
+		instance.on("added", handler);
 
 		childInstance = new MockView();
 		instance.addChild(childInstance);
@@ -327,7 +327,7 @@ class ViewTest
 	{
 		addedCount ++;
 		Assert.areEqual(childInstance,event.target);
-		var type = ViewEventType.Added;
+		var type = BindableEventType.Changed("added");
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
@@ -341,7 +341,7 @@ class ViewTest
 
 		childInstance = new MockView();
 		instance.addChild(childInstance);
-		instance.event.add(handler).forType(ViewEventType.Removed);
+		instance.on("removed", handler);
 
 		var instance2 = new MockView();
 
@@ -394,7 +394,7 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, assertAddedCount, 300);
 		
 		instance = new MockView();
-		instance.event.add(addedViewHandler).forType(ViewEventType.Added);
+		instance.on("added", addedViewHandler);
 
 		childInstance = new MockView();
 		var grandChildInstance = new MockView();
@@ -434,7 +434,8 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, removedHandler, 300);
 		
 		instance = new MockView();
-		instance.event.add(handler).forType(ViewEventType.Removed);
+
+		instance.on("removed", handler);
 
 		childInstance = new MockView();
 		instance.addChild(childInstance);
@@ -445,7 +446,7 @@ class ViewTest
 	{
 		removedCount ++;
 		Assert.areEqual(childInstance,event.target);
-		var type = ViewEventType.Removed;
+		var type = BindableEventType.Changed("removed");
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
@@ -457,7 +458,8 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, assertRemovedCount, 300);
 		
 		instance = new MockView();
-		instance.event.add(removedViewHandler).forType(ViewEventType.Removed);
+
+		instance.on("removed", removedViewHandler);
 
 		childInstance = new MockView();
 		var grandChildInstance = new MockView();
