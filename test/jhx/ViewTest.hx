@@ -12,7 +12,7 @@ import js.Dom;
 /**
 * Auto generated MassiveUnit Test Class  for jhx.View 
 */
-class DataViewTest 
+class ViewTest 
 {
 	var instance:MockView; 
 	var data:MockData;
@@ -582,7 +582,7 @@ class DataViewTest
 		node.setAttribute("id", "tempNode");
 		temp.appendChild(node);
 
-		var view = DataView.fromId(data, "tempNode");
+		var view = View.fromId(data, "tempNode");
 		Assert.areEqual("value", view.element.html());
 
 	}
@@ -591,13 +591,13 @@ class DataViewTest
 	@Test
 	public function should_use_element_type():Void
 	{
-		var view = DataView.fromType(data, "ul");
+		var view = View.fromType(data, "ul");
 		Assert.isTrue(view.element.is("ul"));
 
 	}
 }
 
-private class MockView extends DataView<MockData>
+private class MockView extends View<MockData>
 {
 	public var property(default, set_property):String;
 

@@ -25,6 +25,8 @@ class Main
 }
 
 
+
+
 @template("../template/root.html", "ul")
 class RootView extends ViewRoot
 {
@@ -51,13 +53,20 @@ class RootView extends ViewRoot
 	}
 }
 
-
 @template("../template/child.html")
-class ChildView extends DataView<Bool>
+class ChildView extends View<Bool>
 {
 	public function new()
 	{
 		tagName="li";
 		super();
+	}
+
+	override function getTemplateData():Dynamic
+	{
+		return {
+			index:index,
+			data: data
+		}
 	}
 }

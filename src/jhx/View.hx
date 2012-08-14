@@ -8,7 +8,7 @@ import js.JQuery;
 
 import jhx.Validator;
 
-typedef View = DataView<Dynamic>;
+typedef AnyView = View<Dynamic>;
 
 enum ViewEventType
 {
@@ -20,26 +20,24 @@ enum ViewEventType
 
 
 @:autoBuild(jhx.ViewMacro.build())
-class DataView<TData> implements Validatable, implements EventDispatcher<Event<DataView<TData>, ViewEventType>>
+class View<TData> implements Validatable, implements EventDispatcher<Event<View<TData>, ViewEventType>>
 {
 
-	public static function fromId<T>(data:T, elementId:String):DataView<T>
+	public static function fromId<T>(data:T, elementId:String):View<T>
 	{
 		var element = Lib.document.getElementById(elementId);
-		return new DataView<T>(data, new JQuery(element));
+		return new View<T>(data, new JQuery(element));
 	}
 
-	public static function fromType<T>(data:T, elementType:String):DataView<T>
+	public static function fromType<T>(data:T, elementType:String):View<T>
 	{
 		var element = Lib.document.createElement(elementType);
-		return new DataView<T>(data, new JQuery(element));
+		return new View<T>(data, new JQuery(element));
 	}
-
-
 
 	//-------------------------------------------------------------------------- public previousValues
 
-	public var event(default, null):EventSignal<DataView<TData>, ViewEventType>;
+	public var event(default, null):EventSignal<View<TData>, ViewEventType>;
 	
 	/**
 	 * Unique identifier (viewXXX);
@@ -66,7 +64,7 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 	 * @see View.addChild()
 	 * @see View.removeChild()
 	 */
-	public var parent(default, null):View;
+	public var parent(default, null):AnyView;
 
 	/**
 	 * native html element representing this view in the DOM
@@ -101,26 +99,32 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 	/**
 	 * Contains all children currently added to view
 	 */
-	var children:Array<View>;
+	var children:Array<AnyView>;
 
 	/**
 	 * Container element for children (defaults to same as view.element)
 	 */
 	public var container(get_container, null):JQuery;
 	function get_container():JQuery {
-		if(Reflect.hasField(this, "containerSelector"))
+		if(Reflect.hasField(this, "templateContainerSelector"))
 		{
 
-			return element.find(Reflect.field(this, "containerSelector"));
+			return element.find(Reflect.field(this, "templateContainerSelector"));
+		}
+		else if(containerSelector != null)
+		{
+			return element.find(containerSelector);
 		}
 		return element;
 	}
 
 	var className(default, null):String;
 
-	var changeHandlers:Hash<Array<Event<DataView<TData>, ViewEventType> -> Void>>;
+	var changeHandlers:Hash<Array<Event<View<TData>, ViewEventType> -> Void>>;
 
 	var template:haxe.Template;
+
+	var containerSelector:String;
 	
 	public var html(default, null):String;
 
@@ -135,7 +139,7 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 		previousValues = {};
 		children = [];
 
-		event = new EventSignal<DataView<TData>, ViewEventType>(this);
+		event = new EventSignal<View<TData>, ViewEventType>(this);
 
 		changeHandlers = new Hash();
 		event.add(changed).forType(ViewEventType.Changed("all"));
@@ -149,14 +153,13 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 			setData(data);
 	}
 
-
 	//-------------------------------------------------------------------------- core
 
 	/**
 	 * Dispatch an event, returning `true` if the event should continue to bubble, 
 	 * and `false` if not.
 	 */
-	public function dispatchEvent(event:Event<DataView<TData>, ViewEventType>):Bool
+	public function dispatchEvent(event:Event<View<TData>, ViewEventType>):Bool
 	{
 		this.event.dispatch(event);
 		return true;
@@ -177,6 +180,14 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 		}
 	}
 
+	public function getTemplateData():Dynamic
+	{
+		var o:Dynamic = data;
+		if(o == null) o = this;
+
+		return o;
+	}
+
 	//-------------------------------------------------------------------------- display
 
 
@@ -184,7 +195,7 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 	 * Adds a child view to the display heirachy.
 	 * @param view 	child to add
 	 */
-	public function addChild(view:View)
+	public function addChild(view:AnyView)
 	{
 		Console.assert(view != this, "Cannot add self as child");
 		Console.assert(view.parent != this, "View already child of this");
@@ -208,7 +219,7 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 	 * Removes an existing child view from the display heirachy.
 	 * @param view 	child to remove
 	 */
-	public function removeChild(view:View)
+	public function removeChild(view:AnyView)
 	{
 		var removed = children.remove(view);
 
@@ -271,46 +282,75 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 		}
 	}
 
-	public function on(name:String, handler:Event<DataView<TData>, ViewEventType> -> Void)
+	public function on(type:Dynamic, handler:Event<View<TData>, ViewEventType> -> Void)
 	{
-		if(!changeHandlers.exists(name))
+		if(Std.is(type, String))
 		{
-			changeHandlers.set(name, []);
+			if(!changeHandlers.exists(type))
+			{
+				changeHandlers.set(type, []);
+			}
+			else
+			{
+				off(type, handler);
+			}
+			
+			changeHandlers.get(type).push(handler);
 		}
 		else
 		{
-			off(name, handler);
+			event.add(handler).forType(type);
 		}
-		
-		changeHandlers.get(name).push(handler);
 	}
 
-	public function off(name:String, handler:Event<DataView<TData>, ViewEventType> -> Void):Bool
+	public function off(type:Dynamic, handler:Event<View<TData>, ViewEventType> -> Void):Bool
 	{
-		if(changeHandlers.exists(name))
+		if(Std.is(type, String))
 		{
-			var handlers = changeHandlers.get(name);
-
-			for(i in 0...handlers.length)
+			if(changeHandlers.exists(type))
 			{
-				var h = handlers[i];
+				var handlers = changeHandlers.get(type);
 
-				if(Reflect.compareMethods(h, handler))
+				for(i in 0...handlers.length)
 				{
-					handlers.splice(i, 1);
-					return true;
+					var h = handlers[i];
+
+					if(Reflect.compareMethods(h, handler))
+					{
+						handlers.splice(i, 1);
+						return true;
+					}
 				}
 			}
+			return false;
 		}
-		return false;
+		else
+		{
+			event.remove(handler).forType(type);
+			return true;
+		}
 	}
 
-	public function trigger(?name:String="all")
+	public function trigger(type:Dynamic)
 	{
-		event.bubbleType(Changed(name));
+		if(type == null)
+		{
+			event.bubbleType(Changed("all"));
+		}
+
+		else if(Std.is(type, String))
+		{
+			event.bubbleType(Changed(type));
+		}
+		else if(Std.is(type, ViewEventType))
+		{
+			event.bubbleType(type);
+		}
+
+		
 	}
 
-	function changed(event:Event<DataView<TData>, ViewEventType>)
+	function changed(event:Event<View<TData>, ViewEventType>)
 	{
 		switch(event.type)
 		{
@@ -424,7 +464,8 @@ class DataView<TData> implements Validatable, implements EventDispatcher<Event<D
 	 */
 	function render()
 	{
-		var temp = template.execute(this);
+		var templateData = getTemplateData();
+		var temp = template.execute(templateData);
 
 		if(temp != html && temp != "")
 		{

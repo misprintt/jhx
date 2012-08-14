@@ -90,7 +90,7 @@ class ViewMacro
 			pos : pos
 		};
 
-		return { name : "containerSelector", doc : null, meta : [], access : [APublic], kind : FVar(field,fieldValue), pos : pos };
+		return { name : "templateContainerSelector", doc : null, meta : [], access : [APublic], kind : FVar(field,fieldValue), pos : pos };
 
 	}
 

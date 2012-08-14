@@ -1,7 +1,7 @@
 import massive.munit.TestSuite;
 
-import jhx.DataViewTest;
 import jhx.ValidatorTest;
+import jhx.ViewTest;
 
 /**
  * Auto generated Test Suite for MassiveUnit.
@@ -15,7 +15,7 @@ class TestSuite extends massive.munit.TestSuite
 	{
 		super();
 
-		add(jhx.DataViewTest);
 		add(jhx.ValidatorTest);
+		add(jhx.ViewTest);
 	}
 }
