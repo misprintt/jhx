@@ -139,16 +139,21 @@ class View<TData> extends Bindable<View<TData>>
 	/**
 	 * Sets the data property and triggers a DATA_CHANGED event
 	 * @param data 	data to set
-	 * @param force 	forces change even if data object is identical
+	 * @param forced 	forces change even if data object is identical
 	 */
-	public function setData(data:TData, ?force:Bool=false)
+	public function setData(data:TData, ?forced:Bool=false)
 	{
-		if(this.data != data || force == true)
+		if(this.data != data || forced == true)
 		{
 			previousData = this.data;
-			this.data = data;
+			
 			data = set("data", data);
-			trigger("data");
+
+			if(forced)
+			{
+				this.data = data;
+				trigger("data");
+			}
 		}
 	}
 
