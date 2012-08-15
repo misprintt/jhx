@@ -113,7 +113,7 @@ class View<TData> extends Bindable<View<TData>>
 	
 	public function new(?data:TData=null, ?element:JQuery=null)
 	{
-		super(this);
+		super();
 
 		if(element != null)
 			this.element = element;

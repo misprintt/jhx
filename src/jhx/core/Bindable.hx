@@ -24,8 +24,9 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 	var changeHandlers:Hash<Array<Event<TBindable, BindableEventType> -> Void>>;
 
 
-	public function new(target:TBindable)
+	public function new()
 	{
+		var target:TBindable = cast this;
 		event = new EventSignal<TBindable, BindableEventType>(target);
 
 		previousValues = {};
