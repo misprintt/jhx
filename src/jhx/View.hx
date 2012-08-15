@@ -146,8 +146,9 @@ class View<TData> extends Bindable<View<TData>>
 		if(this.data != data || force == true)
 		{
 			previousData = this.data;
-			data = set("data", data, force);
-			validate();
+			this.data = data;
+			data = set("data", data);
+			trigger("data");
 		}
 	}
 

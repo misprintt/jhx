@@ -47,7 +47,7 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 
 	//-------------------------------------------------------------------------- validation
 
-	public function set<TValue>(name:String, value:TValue, ?force:Bool=false):TValue
+	public function set<TValue>(name:String, value:TValue):TValue
 	{
 		//Console.assert(Reflect.hasField(this, name), className + "." + name + " does not exist.");
 		// Console.assert(Type.typeof(Reflect.field(this, name)) == Type.typeof(value), className + "." + name + " is not of type " + Std.string(Type.typeof(value)));
@@ -55,11 +55,11 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 		var current:TValue = Reflect.field(this, name);
 		var previous:TValue = Reflect.hasField(previousValues, name) ? Reflect.field(previousValues, name) : null;
 
-		if(current == value  && !force)
+		if(current == value)
 		{
 			//do nothing
 		}
-		else if(previous == value && !force)
+		else if(previous == value)
 		{
 			//restore original value;
 			Reflect.setField(this, name, value);
@@ -82,18 +82,22 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 	{
 		var changed:Bool = false;
 
+		var flag = previousValues;
+
 		for(field in Reflect.fields(previousValues))
 		{
 			var previous = Reflect.field(previousValues, field);
 			var current = Reflect.field(this, field);
 
-			changed = true;
-			trigger(field);
+			if(previous != current)
+			{
+				changed = true;
+				trigger(field);
+			}
 		}
 
 		if(changed)
 		{
-			var flag = previousValues;
 			previousValues = {};
 			validated(flag);
 			trigger("all");
@@ -104,22 +108,17 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 	{	
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
 		
-		if(type == "all")
-		{
-			event.add(handler).forType(Changed(null));
-		}
-		else if(Std.is(type, String))
+		if(Std.is(type, String))
 		{
 			if(!changeHandlers.exists(type))
 			{
-				changeHandlers.set(type, []);
+				changeHandlers.set(type, [handler]);
 			}
 			else
 			{
 				off(type, handler);
+				changeHandlers.get(type).push(handler);
 			}
-			
-			changeHandlers.get(type).push(handler);
 		}
 		else
 		{
@@ -131,12 +130,8 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 	{
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
 		
-		if(type == "all")
-		{
-			event.remove(handler).forType(Changed(null));
-			return true;
-		}
-		else if(Std.is(type, String))
+	
+		if(Std.is(type, String))
 		{
 			if(changeHandlers.exists(type))
 			{
@@ -167,12 +162,12 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 	{
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
 		
-		if(type == "all")
+		if(Std.is(type, String))
 		{
-			event.bubbleType(Changed(null));
-		}
-		else if(Std.is(type, String))
-		{
+			if(Reflect.hasField(previousValues, type))
+			{
+				Reflect.deleteField(previousValues, type);
+			}
 			event.bubbleType(Changed(type));
 		}
 		else if(Std.is(type, BindableEventType))
@@ -186,11 +181,11 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 	{
 		switch(event.type)
 		{
-			case Changed(field):
+			case Changed(type):
 			{
-				if(changeHandlers.exists(field))
+				if(changeHandlers.exists(type))
 				{
-					var handlers = changeHandlers.get(field).concat([]);
+					var handlers = changeHandlers.get(type).concat([]);
 					for(handler in handlers)
 					{
 						handler(event);
