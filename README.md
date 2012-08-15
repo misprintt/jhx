@@ -5,6 +5,8 @@ A Haxe JavaScript View Framework
 
 View component that composes a JQuery element and a typed data property.
 
+> **Please Note:** This is still an early work in progress and is subject to change :)
+
 
 Features:
 
@@ -14,8 +16,6 @@ Features:
 * display API (addChild, removeChild, removeAllChildren)
 * lifecycle (initialize, added, render, removed, destroy )
 
-
-> **Please Note:"** This is a work in progress and is subject to change :)
 
 ### View
 
