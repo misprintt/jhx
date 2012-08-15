@@ -4,7 +4,7 @@ import massive.munit.util.Timer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import jhx.View;
-
+import jhx.core.Bindable;
 import js.JQuery;
 import js.Lib;
 import js.Dom;
@@ -118,7 +118,7 @@ class ViewTest
 		changed = true;
 		changedValues.push("data");
 		Assert.areEqual(MockView, Type.getClass(event.target));
-		var type = ViewEventType.Changed("data");
+		var type = BindableEventType.Changed("data");
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
@@ -139,11 +139,6 @@ class ViewTest
 		Timer.delay(handler,200);
 	}
 
-	function assertDataNotChanged()
-	{
-		Assert.isFalse(changed);
-	}
-
 	@AsyncTest
 	public function should_dispatch_data_changed_if_forced(factory:AsyncFactory):Void
 	{
@@ -159,145 +154,7 @@ class ViewTest
 		instance.setData(data, true);
 	}
 
-	//-------------------------------------------------------------------------- validation
-	
-	
-	@AsyncTest
-	public function should_dispatch_change_all(factory:AsyncFactory):Void
-	{
-		var handler:Dynamic = factory.createHandler(this, changedAllHandler, 300);
-		instance = new MockView();
-		instance.on("all", handler);
-		instance.property = "foo";
-	}	
-
-	function changedAllHandler(event)
-	{
-		changed = true;
-		changedValues.push("all");
-
-		Assert.areEqual(MockView, Type.getClass(event.target));
-		var type = ViewEventType.Changed("all");
-		Assert.isTrue(Type.enumEq(type, event.type));
-	}
-
-	@AsyncTest
-	public function should_dispatch_property_change(factory:AsyncFactory):Void
-	{
-		var handler:Dynamic = factory.createHandler(this, propertyChangedHandler, 300);
-
-		instance = new MockView();
-		instance.on("property", handler);
-		instance.property = "foo";
-	}	
-
-	function propertyChangedHandler(event)
-	{
-		changed = true;
-		changedValues.push("property");
-
-		Assert.areEqual(MockView, Type.getClass(event.target));
-		
-		var type = ViewEventType.Changed("property");
-		Assert.isTrue(Type.enumEq(type, event.type));
-
-	}
-
-	@AsyncTest
-	public function should_not_dispatch_if_off(factory:AsyncFactory):Void
-	{
-		var handler:Dynamic = factory.createHandler(this, assertNotChanged, 300);
-
-		instance = new MockView();
-		changed = false;
-		instance.on("property", propertyChangedHandler);
-		
-		Assert.isTrue(instance.off("property", propertyChangedHandler));
-		instance.property = "foo";
-
-		Timer.delay(handler, 200);
-	}	
-
-	function assertNotChanged()
-	{
-		Assert.isFalse(changed);
-		Assert.areEqual("", changedValues.join(","));
-	}
-
-	@AsyncTest
-	public function should_dispatch_property_before_all(factory:AsyncFactory):Void
-	{
-		var handler:Dynamic = factory.createHandler(this, assertPropertyChangedBeforeAll, 300);
-
-		instance = new MockView();
-		changed = false;
-		instance.on("property", propertyChangedHandler);
-		instance.on("all", changedAllHandler);
-		
-		instance.property = "foo";
-
-		Timer.delay(handler, 200);
-	}	
-
-	function assertPropertyChangedBeforeAll()
-	{
-		Assert.isTrue(changed);
-		Assert.areEqual("property,all", changedValues.join(","));
-	}
-
-
-	
-	@Test
-	public function should_not_dispatch_changed_if_unchanged():Void
-	{
-		instance = new MockView();
-		instance.on("property", propertyChangedHandler);
-		instance.on("all", changedAllHandler);
-		
-		instance.validate();
-
-		Assert.isFalse(changed);
-	}
-
-	@AsyncTest
-	public function should_not_dispatch_property_changed_if_reverted_to_original_value(factory:AsyncFactory):Void
-	{
-		var handler:Dynamic = factory.createHandler(this, assertNotChanged, 300);
-
-		instance = new MockView();
-		changed = false;
-		instance.on("property", propertyChangedHandler);
-		instance.on("all", changedAllHandler);
-		
-		instance.property = "foo";
-		instance.property = null;
-
-		Timer.delay(handler, 200);
-	}	
-
-
-
-	@AsyncTest
-	public function should_remove_duplicate_handler_references_from_on(factory:AsyncFactory):Void
-	{
-		var handler:Dynamic = factory.createHandler(this, assertPropertyChangedOnce, 300);
-
-		instance = new MockView();
-		changed = false;
-		instance.on("property", propertyChangedHandler);
-		instance.on("property", propertyChangedHandler);
-		
-		instance.property = "foo";
-
-		Timer.delay(handler, 200);
-	}	
-
-	function assertPropertyChangedOnce()
-	{
-		Assert.isTrue(changed);
-		Assert.areEqual("property", changedValues.join(","));
-	}
-	//-------------------------------------------------------------------------- add child
+	// //-------------------------------------------------------------------------- add child
 	
 	@Test
 	public function should_set_parent_on_addChild():Void
@@ -317,7 +174,7 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, addedHandler, 300);
 		
 		instance = new MockView();
-		instance.event.add(handler).forType(ViewEventType.Added);
+		instance.on("added", handler);
 
 		childInstance = new MockView();
 		instance.addChild(childInstance);
@@ -327,7 +184,7 @@ class ViewTest
 	{
 		addedCount ++;
 		Assert.areEqual(childInstance,event.target);
-		var type = ViewEventType.Added;
+		var type = BindableEventType.Changed("added");
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
@@ -341,7 +198,7 @@ class ViewTest
 
 		childInstance = new MockView();
 		instance.addChild(childInstance);
-		instance.event.add(handler).forType(ViewEventType.Removed);
+		instance.on("removed", handler);
 
 		var instance2 = new MockView();
 
@@ -349,6 +206,14 @@ class ViewTest
 
 		Assert.areEqual(instance2, childInstance.parent);
 		Assert.areEqual(0, childInstance.index);
+	}
+
+	function removedHandler(event)
+	{
+		removedCount ++;
+		Assert.areEqual(childInstance,event.target);
+		var type = BindableEventType.Changed("removed");
+		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
 	@Test
@@ -394,7 +259,7 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, assertAddedCount, 300);
 		
 		instance = new MockView();
-		instance.event.add(addedViewHandler).forType(ViewEventType.Added);
+		instance.on("added", addedViewHandler);
 
 		childInstance = new MockView();
 		var grandChildInstance = new MockView();
@@ -410,12 +275,8 @@ class ViewTest
 		addedCount ++;
 	}
 
-	function assertAddedCount()
-	{
-		Assert.areEqual(2, addedCount);
-	}
-
-	//-------------------------------------------------------------------------- remove child
+	// //-------------------------------------------------------------------------- remove child
+	
 	@Test
 	public function should_nullify_parent_on_removeChild():Void
 	{
@@ -434,22 +295,13 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, removedHandler, 300);
 		
 		instance = new MockView();
-		instance.event.add(handler).forType(ViewEventType.Removed);
+
+		instance.on("removed", handler);
 
 		childInstance = new MockView();
 		instance.addChild(childInstance);
 		instance.removeChild(childInstance);
 	}
-
-	function removedHandler(event)
-	{
-		removedCount ++;
-		Assert.areEqual(childInstance,event.target);
-		var type = ViewEventType.Removed;
-		Assert.isTrue(Type.enumEq(type, event.type));
-	}
-
-
 
 	@AsyncTest
 	public function should_dispatch_removed_for_all_descendants(factory:AsyncFactory):Void
@@ -457,7 +309,8 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, assertRemovedCount, 300);
 		
 		instance = new MockView();
-		instance.event.add(removedViewHandler).forType(ViewEventType.Removed);
+
+		instance.on("removed", removedViewHandler);
 
 		childInstance = new MockView();
 		var grandChildInstance = new MockView();
@@ -473,11 +326,6 @@ class ViewTest
 	function removedViewHandler(event)
 	{
 		removedCount ++;
-	}
-
-	function assertRemovedCount()
-	{
-		Assert.areEqual(2, removedCount);
 	}
 
 	@Test
@@ -510,7 +358,8 @@ class ViewTest
 	}
 
 
-	//-------------------------------------------------------------------------- removeAllChildren
+	// //-------------------------------------------------------------------------- removeAllChildren
+
 	@Test
 	public function should_removeAllChildren():Void
 	{
@@ -525,7 +374,8 @@ class ViewTest
 	}
 
 
-	//-------------------------------------------------------------------------- destroy
+	// //-------------------------------------------------------------------------- destroy
+	
 	@Test
 	public function should_remove_all_descendants_on_destroy():Void
 	{
@@ -543,7 +393,7 @@ class ViewTest
 	}
 
 
-	//-------------------------------------------------------------------------- template
+	// //-------------------------------------------------------------------------- template
 
 	@Test
 	public function should_have_empty_innerHTML():Void
@@ -560,7 +410,7 @@ class ViewTest
 		Assert.areEqual("This is some text", instance.element.html());
 	}
 
-	//-------------------------------------------------------------------------- 
+	// //-------------------------------------------------------------------------- 
 	
 	@Test
 	public function should_return_className_and_id_in_toString():Void
@@ -587,7 +437,6 @@ class ViewTest
 
 	}
 
-
 	@Test
 	public function should_use_element_type():Void
 	{
@@ -595,18 +444,32 @@ class ViewTest
 		Assert.isTrue(view.element.is("ul"));
 
 	}
+
+	 //-------------------------------------------------------------------------- asserts
+	
+
+	function assertDataNotChanged()
+	{
+		Assert.isTrue(changedValues.join(",").indexOf("data") == -1);
+	}
+
+
+	function assertAddedCount()
+	{
+		Assert.areEqual(2, addedCount);
+	}
+
+	function assertRemovedCount()
+	{
+		Assert.areEqual(2, removedCount);
+	}
+
+
 }
 
 private class MockView extends View<MockData>
 {
-	public var property(default, set_property):String;
-
 	public var destroyed:Bool;
-
-	function set_property(value:String):String
-	{
-		return set("property", value);
-	}
 
 	public function new(?data:MockData=null, ?element:JQuery=null)
 	{
