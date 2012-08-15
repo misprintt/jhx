@@ -105,76 +105,53 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 		}
 	}
 
-	public function on(type:Dynamic, handler:Event<TChangeable, ChangeableEventType> -> Void)
+	public function on(type:String, handler:Event<TChangeable, ChangeableEventType> -> Void)
 	{	
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
 		
-		if(Std.is(type, String))
+		if(!changeHandlers.exists(type))
 		{
-			if(!changeHandlers.exists(type))
-			{
-				changeHandlers.set(type, [handler]);
-			}
-			else
-			{
-				off(type, handler);
-				changeHandlers.get(type).push(handler);
-			}
+			changeHandlers.set(type, [handler]);
 		}
 		else
 		{
-			event.add(handler).forType(type);
+			off(type, handler);
+			changeHandlers.get(type).push(handler);
 		}
 	}
 
-	public function off(type:Dynamic, handler:Event<TChangeable, ChangeableEventType> -> Void):Bool
+	public function off(type:String, handler:Event<TChangeable, ChangeableEventType> -> Void):Bool
 	{
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
-		
 	
-		if(Std.is(type, String))
+		if(changeHandlers.exists(type))
 		{
-			if(changeHandlers.exists(type))
+			var handlers = changeHandlers.get(type);
+
+			for(i in 0...handlers.length)
 			{
-				var handlers = changeHandlers.get(type);
+				var h = handlers[i];
 
-				for(i in 0...handlers.length)
+				if(Reflect.compareMethods(h, handler))
 				{
-					var h = handlers[i];
-
-					if(Reflect.compareMethods(h, handler))
-					{
-						handlers.splice(i, 1);
-						return true;
-					}
+					handlers.splice(i, 1);
+					return true;
 				}
 			}
-			return false;
 		}
-		else
-		{
-			event.remove(handler).forType(type);
-			return true;
-		}
+		return false;
 	}
 
 
-	public function trigger(type:Dynamic)
+	public function trigger(type:String)
 	{
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
 		
-		if(Std.is(type, String))
+		if(Reflect.hasField(previousValues, type))
 		{
-			if(Reflect.hasField(previousValues, type))
-			{
-				Reflect.deleteField(previousValues, type);
-			}
-			event.bubbleType(Changed(type));
+			Reflect.deleteField(previousValues, type);
 		}
-		else if(Std.is(type, ChangeableEventType))
-		{
-			event.bubbleType(type);
-		}
+		event.bubbleType(Changed(type));
 	}
 
 

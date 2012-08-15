@@ -40,9 +40,10 @@ class ChangeableTest
 	@After
 	public function tearDown():Void
 	{
+		instance = null;
 	}
 
-	//-------------------------------------------------------------------------- validation
+	//-------------------------------------------------------------------------- on("all")
 	
 	
 	@AsyncTest
@@ -64,6 +65,9 @@ class ChangeableTest
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
+
+	//-------------------------------------------------------------------------- on(property)
+
 	@AsyncTest
 	public function should_dispatch_property_change(factory:AsyncFactory):Void
 	{
@@ -83,27 +87,6 @@ class ChangeableTest
 		var type = ChangeableEventType.Changed("property");
 		Assert.isTrue(Type.enumEq(type, event.type));
 
-	}
-
-	@AsyncTest
-	public function should_not_dispatch_if_off(factory:AsyncFactory):Void
-	{
-		var handler:Dynamic = factory.createHandler(this, assertPropertyNotChanged, 300);
-
-		instance = new Mock();
-		changed = false;
-		
-		instance.on("property", propertyChangedHandler);
-		
-		Assert.isTrue(instance.off("property", propertyChangedHandler));
-		instance.property = "foo";
-
-		Timer.delay(handler, 200);
-	}	
-
-	function assertPropertyNotChanged()
-	{
-		Assert.isTrue(values.join(",").indexOf("property") == -1);
 	}
 
 	@AsyncTest
@@ -184,6 +167,73 @@ class ChangeableTest
 		Assert.isTrue(changed);
 		Assert.isTrue(values.join(",").lastIndexOf("property") == 0);
 	}
+
+	//-------------------------------------------------------------------------- off
+
+	@AsyncTest
+	public function should_not_dispatch_if_off(factory:AsyncFactory):Void
+	{
+		var handler:Dynamic = factory.createHandler(this, assertPropertyNotChanged, 300);
+
+		instance = new Mock();
+		changed = false;
+		
+		instance.on("property", propertyChangedHandler);
+		
+		Assert.isTrue(instance.off("property", propertyChangedHandler));
+		instance.property = "foo";
+
+		Timer.delay(handler, 200);
+	}	
+
+	function assertPropertyNotChanged()
+	{
+		Assert.isTrue(values.join(",").indexOf("property") == -1);
+	}
+
+	@Test
+	public function  should_return_true_for_off_with_matching_type_and_handler():Void
+	{
+		var handler = function(event){};
+
+		instance = new Mock();
+		instance.on("property", handler);
+		var result:Bool = instance.off("property", handler);
+		
+		Assert.isTrue(result);
+	}
+
+	@Test
+	public function  should_return_false_for_off_with_unhandled_type():Void
+	{
+		var handler = function(event){};
+
+		instance = new Mock();
+		var result:Bool = instance.off("property", handler);
+		
+		Assert.isFalse(result);
+	}
+
+
+	@Test
+	public function should_return_false_for_off_with_non_matching_handler():Void
+	{
+		var handler1 = function(event){};
+		var handler2 = function(event){};
+
+		instance = new Mock();
+		instance.on("property", handler1);
+
+
+		var result:Bool = instance.off("property", handler2);
+		
+		Assert.isFalse(result);
+	}
+
+
+	//-------------------------------------------------------------------------- 
+
+	
 
 }
 
