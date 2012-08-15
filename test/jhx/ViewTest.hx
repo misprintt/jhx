@@ -4,7 +4,7 @@ import massive.munit.util.Timer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import jhx.View;
-import jhx.core.Bindable;
+import jhx.core.Changeable;
 import js.JQuery;
 import js.Lib;
 import js.Dom;
@@ -118,7 +118,7 @@ class ViewTest
 		changed = true;
 		changedValues.push("data");
 		Assert.areEqual(MockView, Type.getClass(event.target));
-		var type = BindableEventType.Changed("data");
+		var type = ChangeableEventType.Changed("data");
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
@@ -184,7 +184,7 @@ class ViewTest
 	{
 		addedCount ++;
 		Assert.areEqual(childInstance,event.target);
-		var type = BindableEventType.Changed("added");
+		var type = ChangeableEventType.Changed("added");
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
@@ -212,7 +212,7 @@ class ViewTest
 	{
 		removedCount ++;
 		Assert.areEqual(childInstance,event.target);
-		var type = BindableEventType.Changed("removed");
+		var type = ChangeableEventType.Changed("removed");
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 

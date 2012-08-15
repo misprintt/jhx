@@ -1,6 +1,6 @@
 import massive.munit.TestSuite;
 
-import jhx.core.BindableTest;
+import jhx.core.ChangeableTest;
 import jhx.core.ValidatorTest;
 import jhx.ViewTest;
 
@@ -16,7 +16,7 @@ class TestSuite extends massive.munit.TestSuite
 	{
 		super();
 
-		add(jhx.core.BindableTest);
+		add(jhx.core.ChangeableTest);
 		add(jhx.core.ValidatorTest);
 		add(jhx.ViewTest);
 	}

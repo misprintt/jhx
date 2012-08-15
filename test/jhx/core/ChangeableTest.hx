@@ -3,12 +3,12 @@ package jhx.core;
 import massive.munit.util.Timer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
-import jhx.core.Bindable;
+import jhx.core.Changeable;
 
 /**
-* Auto generated MassiveUnit Test Class  for jhx.core.Bindable 
+* Auto generated MassiveUnit Test Class  for jhx.core.Changeable 
 */
-class BindableTest 
+class ChangeableTest 
 {
 	var instance:Mock; 
 
@@ -60,7 +60,7 @@ class BindableTest
 		values.push("all");
 
 		Assert.areEqual(Mock, Type.getClass(event.target));
-		var type = BindableEventType.Changed("all");
+		var type = ChangeableEventType.Changed("all");
 		Assert.isTrue(Type.enumEq(type, event.type));
 	}
 
@@ -80,7 +80,7 @@ class BindableTest
 
 		Assert.areEqual(Mock, Type.getClass(event.target));
 		
-		var type = BindableEventType.Changed("property");
+		var type = ChangeableEventType.Changed("property");
 		Assert.isTrue(Type.enumEq(type, event.type));
 
 	}
@@ -187,7 +187,7 @@ class BindableTest
 
 }
 
-private class Mock extends Bindable<Mock>
+private class Mock extends Changeable<Mock>
 {
 	public var property(default, set_property):String;
 

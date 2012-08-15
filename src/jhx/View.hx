@@ -7,12 +7,12 @@ import js.Dom;
 import js.JQuery;
 
 import jhx.core.Validator;
-import jhx.core.Bindable;
+import jhx.core.Changeable;
 
 typedef AnyView = View<Dynamic>;
 
 @:autoBuild(jhx.ViewMacro.build())
-class View<TData> extends Bindable<View<TData>>
+class View<TData> extends Changeable<View<TData>>
 {
 	public static function fromId<T>(data:T, elementId:String):View<T>
 	{

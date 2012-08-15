@@ -2,18 +2,18 @@ package jhx.core;
 import jhx.core.Validator;
 import msignal.EventSignal;
 
-enum BindableEventType
+enum ChangeableEventType
 {
 	Changed(name:String);
 }
 
-typedef AnyBindable = Bindable<Dynamic>;
+typedef AnyChangeable = Changeable<Dynamic>;
 
-class Bindable<TBindable> implements Validatable, implements EventDispatcher<Event<TBindable, BindableEventType>>
+class Changeable<TChangeable> implements Validatable, implements EventDispatcher<Event<TChangeable, ChangeableEventType>>
 {
 	static var validator:Validator = new Validator();
 
-	public var event(default, null):EventSignal<TBindable, BindableEventType>;
+	public var event(default, null):EventSignal<TChangeable, ChangeableEventType>;
 
 	/**
 	 * Reference to inChanged property values
@@ -21,17 +21,17 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 	var previousValues:Dynamic;
 
 
-	var changeHandlers:Hash<Array<Event<TBindable, BindableEventType> -> Void>>;
+	var changeHandlers:Hash<Array<Event<TChangeable, ChangeableEventType> -> Void>>;
 
 
 	public function new()
 	{
-		var target:TBindable = cast this;
-		event = new EventSignal<TBindable, BindableEventType>(target);
+		var target:TChangeable = cast this;
+		event = new EventSignal<TChangeable, ChangeableEventType>(target);
 
 		previousValues = {};
 		changeHandlers = new Hash();
-		event.add(changed).forType(BindableEventType.Changed(null));
+		event.add(changed).forType(ChangeableEventType.Changed(null));
 
 	}
 
@@ -39,7 +39,7 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 	 * Dispatch an event, returning `true` if the event should continue to bubble, 
 	 * and `false` if not.
 	 */
-	public function dispatchEvent(event:Event<TBindable, BindableEventType>):Bool
+	public function dispatchEvent(event:Event<TChangeable, ChangeableEventType>):Bool
 	{
 		this.event.dispatch(event);
 		return true;
@@ -105,7 +105,7 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 		}
 	}
 
-	public function on(type:Dynamic, handler:Event<TBindable, BindableEventType> -> Void)
+	public function on(type:Dynamic, handler:Event<TChangeable, ChangeableEventType> -> Void)
 	{	
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
 		
@@ -127,7 +127,7 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 		}
 	}
 
-	public function off(type:Dynamic, handler:Event<TBindable, BindableEventType> -> Void):Bool
+	public function off(type:Dynamic, handler:Event<TChangeable, ChangeableEventType> -> Void):Bool
 	{
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
 		
@@ -171,14 +171,14 @@ class Bindable<TBindable> implements Validatable, implements EventDispatcher<Eve
 			}
 			event.bubbleType(Changed(type));
 		}
-		else if(Std.is(type, BindableEventType))
+		else if(Std.is(type, ChangeableEventType))
 		{
 			event.bubbleType(type);
 		}
 	}
 
 
-	function changed(event:Event<TBindable, BindableEventType>)
+	function changed(event:Event<TChangeable, ChangeableEventType>)
 	{
 		switch(event.type)
 		{
