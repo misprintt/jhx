@@ -10,6 +10,8 @@ class Main
 	static public function main()
 	{
 
+		Console.start();
+
 		var body = new JQuery("body");
 		var root = new RootView();
 
@@ -23,9 +25,6 @@ class Main
 		}
 	}
 }
-
-
-
 
 @template("../template/root.html", "ul")
 class RootView extends ViewRoot
@@ -47,7 +46,7 @@ class RootView extends ViewRoot
 		for(child in children)
 		{
 			var view:ChildView = cast child;
-			untyped console.log(view, toggled);
+			trace(view, toggled);
 			child.setData(toggled);
 		}
 	}
