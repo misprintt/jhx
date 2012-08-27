@@ -79,7 +79,6 @@ class ChangeableTest
 	@AsyncTest
 	public function should_dispatch_property_change(factory:AsyncFactory):Void
 	{
-		trace("should_dispatch_property_change");
 		var handler:Dynamic = factory.createHandler(this, propertyChangedHandler, 300);
 		instance = new Mock();
 		instance.on("property", handler);

@@ -52,7 +52,6 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 		var current:TValue = Reflect.field(this, name);
 		var previous:TValue = Reflect.hasField(previousValues, name) ? Reflect.field(previousValues, name) : null;
 
-		trace("set " + name + ":" + Std.string(current) + ", " + Std.string(previous) + ", " + Std.string(value));
 		if(current == value)
 		{
 			//do nothing
@@ -78,7 +77,6 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 
 	public function validate()
 	{
-		trace("validate ");
 		var changed:Bool = false;
 
 		var flag = previousValues;
@@ -121,7 +119,6 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 
 	public function trigger(type:String)
 	{
-		trace("trigger " + type);
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
 		
 		if(Reflect.hasField(previousValues, type))
