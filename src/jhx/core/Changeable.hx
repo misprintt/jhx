@@ -2,10 +2,8 @@ package jhx.core;
 import jhx.core.Validator;
 import msignal.EventSignal;
 
-enum ChangeableEventType
-{
-	Changed(name:String);
-}
+
+typedef ChangeableEventType = String;
 
 typedef AnyChangeable = Changeable<Dynamic>;
 
@@ -20,18 +18,16 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 	 */
 	var previousValues:Dynamic;
 
-
 	var changeHandlers:Hash<Array<Event<TChangeable, ChangeableEventType> -> Void>>;
-
 
 	public function new()
 	{
 		var target:TChangeable = cast this;
-		event = new EventSignal<TChangeable, ChangeableEventType>(target);
 
 		previousValues = {};
-		changeHandlers = new Hash();
-		event.add(changed).forType(ChangeableEventType.Changed(null));
+
+		event = new EventSignal<TChangeable, ChangeableEventType>(target);
+		event.addWithPriority(changed, 1);
 
 	}
 
@@ -56,6 +52,7 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 		var current:TValue = Reflect.field(this, name);
 		var previous:TValue = Reflect.hasField(previousValues, name) ? Reflect.field(previousValues, name) : null;
 
+		trace("set " + name + ":" + Std.string(current) + ", " + Std.string(previous) + ", " + Std.string(value));
 		if(current == value)
 		{
 			//do nothing
@@ -81,6 +78,7 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 
 	public function validate()
 	{
+		trace("validate ");
 		var changed:Bool = false;
 
 		var flag = previousValues;
@@ -108,70 +106,35 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 	public function on(type:String, handler:Event<TChangeable, ChangeableEventType> -> Void)
 	{	
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
-		
-		if(!changeHandlers.exists(type))
-		{
-			changeHandlers.set(type, [handler]);
-		}
+
+		if(type == "all")
+			event.add(handler);
 		else
-		{
-			off(type, handler);
-			changeHandlers.get(type).push(handler);
-		}
+			event.add(handler).forType(type);
 	}
 
-	public function off(type:String, handler:Event<TChangeable, ChangeableEventType> -> Void):Bool
+	public function off(type:String, handler:Event<TChangeable, ChangeableEventType> -> Void)
 	{
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
-	
-		if(changeHandlers.exists(type))
-		{
-			var handlers = changeHandlers.get(type);
-
-			for(i in 0...handlers.length)
-			{
-				var h = handlers[i];
-
-				if(Reflect.compareMethods(h, handler))
-				{
-					handlers.splice(i, 1);
-					return true;
-				}
-			}
-		}
-		return false;
+		event.remove(handler);
 	}
-
 
 	public function trigger(type:String)
 	{
+		trace("trigger " + type);
 		Console.assert(type != null, "type cannot be null : " + Std.string(type));
 		
 		if(Reflect.hasField(previousValues, type))
 		{
 			Reflect.deleteField(previousValues, type);
 		}
-		event.bubbleType(Changed(type));
+		event.bubbleType(type);
 	}
 
 
 	function changed(event:Event<TChangeable, ChangeableEventType>)
 	{
-		switch(event.type)
-		{
-			case Changed(type):
-			{
-				if(changeHandlers.exists(type))
-				{
-					var handlers = changeHandlers.get(type).concat([]);
-					for(handler in handlers)
-					{
-						handler(event);
-					}
-				}
-			}
-			default:
-		}
+		
 	}
 
 	function validated(flag:Dynamic)

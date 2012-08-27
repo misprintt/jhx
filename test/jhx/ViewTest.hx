@@ -118,8 +118,7 @@ class ViewTest
 		changed = true;
 		changedValues.push("data");
 		Assert.areEqual(MockView, Type.getClass(event.target));
-		var type = ChangeableEventType.Changed("data");
-		Assert.isTrue(Type.enumEq(type, event.type));
+		Assert.areEqual("data", event.type);
 	}
 
 	@AsyncTest
@@ -184,8 +183,7 @@ class ViewTest
 	{
 		addedCount ++;
 		Assert.areEqual(childInstance,event.target);
-		var type = ChangeableEventType.Changed("added");
-		Assert.isTrue(Type.enumEq(type, event.type));
+		Assert.areEqual("added", event.type);
 	}
 
 
@@ -212,8 +210,7 @@ class ViewTest
 	{
 		removedCount ++;
 		Assert.areEqual(childInstance,event.target);
-		var type = ChangeableEventType.Changed("removed");
-		Assert.isTrue(Type.enumEq(type, event.type));
+		Assert.areEqual("removed", event.type);
 	}
 
 	@Test

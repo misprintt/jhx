@@ -35,10 +35,12 @@ class Validator
 
 	public function validate():Void
 	{
-		while (stack.length > 0)
+		var stackCopy = stack.concat([]);
+		while (stackCopy.length > 0)
 		{
-			var item = stack.shift();
+			var item = stackCopy.shift();
 			item.validate();
+			stack.remove(item);
 		}
 
 		valid = true;
