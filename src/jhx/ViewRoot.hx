@@ -13,6 +13,5 @@ class ViewRoot extends View<Dynamic>
 	override function initialize()
 	{
 		super.initialize();
-		
 	}
 }

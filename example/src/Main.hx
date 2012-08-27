@@ -20,7 +20,7 @@ class Main
 		for(i in 0...3)
 		{
 			var child = new ChildView();
-			child.setData(true);
+			child.setData(false);
 			root.addChild(child);
 		}
 	}
@@ -29,7 +29,7 @@ class Main
 @template("../template/root.html", "ul")
 class RootView extends ViewRoot
 {
-	public var toggled:Bool;
+	@set var toggled:Bool;
 	public function new()
 	{
 		Reflect.setField(this, "toggled", false);
@@ -41,7 +41,7 @@ class RootView extends ViewRoot
 
 	function clickHandler(e)
 	{
-		set("toggled", !toggled);
+		toggled = !toggled;
 
 		for(child in children)
 		{

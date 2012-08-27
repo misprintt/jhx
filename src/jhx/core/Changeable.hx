@@ -2,11 +2,16 @@ package jhx.core;
 import jhx.core.Validator;
 import msignal.EventSignal;
 
+#if macro
+import haxe.macro.Expr;
+import haxe.macro.Context;
+#end
 
 typedef ChangeableEventType = String;
 
 typedef AnyChangeable = Changeable<Dynamic>;
 
+@:autoBuild(jhx.core.ChangeableMacro.build())
 class Changeable<TChangeable> implements Validatable, implements EventDispatcher<Event<TChangeable, ChangeableEventType>>
 {
 	static var validator:Validator = new Validator();
@@ -44,7 +49,7 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 
 	//-------------------------------------------------------------------------- validation
 
-	public function set<TValue>(name:String, value:TValue):TValue
+	function set<TValue>(name:String, value:TValue):TValue
 	{
 		//Console.assert(Reflect.hasField(this, name), className + "." + name + " does not exist.");
 		// Console.assert(Type.typeof(Reflect.field(this, name)) == Type.typeof(value), className + "." + name + " is not of type " + Std.string(Type.typeof(value)));
@@ -100,6 +105,56 @@ class Changeable<TChangeable> implements Validatable, implements EventDispatcher
 			trigger("all");
 		}
 	}
+
+	// #if macro
+	// @:macro public function on(prop:Expr,handler:Expr) : Expr
+	// {
+	// 	var propName:String = null;
+	// 	var propScope:Expr = null;
+
+	// 	switch(prop.expr)
+	// 	{
+	// 		case EField(e, field):
+	// 		{
+	// 			propName = field;
+	// 			switch(e.expr)
+	// 			{
+	// 				case EConst(c):
+	// 				{
+	// 					switch(c)
+	// 					{
+	// 						case CIdent(s): return e;
+	// 						default : null;
+	// 					}
+	// 				}
+	// 				default: null;
+	// 			}	
+	// 		}
+	// 		default: null;
+	// 	}
+
+	// 	var eFunc : Expr = 
+	// 	{
+	// 		expr: EConst(CIdent("_on"),
+	// 		pos:Context.currentPos()
+	// 	}
+
+	// 	var eProp : Expr = 
+	// 	{
+	// 		expr: EConst(CString(propName)),
+	// 		pos:Context.currentPos()
+	// 	}
+
+	// 	var eCall :Expr =
+	// 	{
+	// 		expr: ECall(eFunc, [eProp, handler]),
+	// 		pos:Context.currentPos()
+	// 	}
+
+	// 	return eCall;
+	// }	
+	// #end
+
 
 	public function on(type:String, handler:Event<TChangeable, ChangeableEventType> -> Void)
 	{	

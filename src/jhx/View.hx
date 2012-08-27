@@ -14,6 +14,9 @@ typedef AnyView = View<Dynamic>;
 @:autoBuild(jhx.ViewMacro.build())
 class View<TData> extends Changeable<View<TData>>
 {
+	static public inline var ADDED:String = "added";
+	static public inline var REMOVED:String = "removed";
+	
 	public static function fromId<T>(data:T, elementId:String):View<T>
 	{
 		var element = Lib.document.getElementById(elementId);
@@ -38,15 +41,14 @@ class View<TData> extends Changeable<View<TData>>
 	 * Current data value
 	 * @see setData()
 	 */
-	public var data(default, null):TData;
+	@set @get var data:TData;
 
 	/**
 	 * reference to the index relative to siblings
 	 * defaults to -1 when view has no parent 
 	 * @see View.addChild()
 	 */
-	public var index(default, set_index):Int;
-	function set_index(value:Int):Int {return set("index", value);}
+	@set var index:Int;
 
 
 	/**
@@ -329,7 +331,7 @@ class View<TData> extends Changeable<View<TData>>
 			child.added();
 		}
 
-		trigger("added");
+		trigger(View.ADDED);
 	}
 
 	/**
@@ -344,7 +346,7 @@ class View<TData> extends Changeable<View<TData>>
 			child.removed();
 		}
 
-		trigger("removed");
+		trigger(View.REMOVED);
 	}
 
 }

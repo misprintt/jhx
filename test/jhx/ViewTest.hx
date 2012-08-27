@@ -173,7 +173,7 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, addedHandler, 300);
 		
 		instance = new MockView();
-		instance.on("added", handler);
+		instance.on(View.ADDED, handler);
 
 		childInstance = new MockView();
 		instance.addChild(childInstance);
@@ -183,7 +183,7 @@ class ViewTest
 	{
 		addedCount ++;
 		Assert.areEqual(childInstance,event.target);
-		Assert.areEqual("added", event.type);
+		Assert.areEqual(View.ADDED, event.type);
 	}
 
 
@@ -196,7 +196,7 @@ class ViewTest
 
 		childInstance = new MockView();
 		instance.addChild(childInstance);
-		instance.on("removed", handler);
+		instance.on(View.REMOVED, handler);
 
 		var instance2 = new MockView();
 
@@ -210,7 +210,7 @@ class ViewTest
 	{
 		removedCount ++;
 		Assert.areEqual(childInstance,event.target);
-		Assert.areEqual("removed", event.type);
+		Assert.areEqual(View.REMOVED, event.type);
 	}
 
 	@Test
@@ -256,7 +256,7 @@ class ViewTest
 		var handler:Dynamic = factory.createHandler(this, assertAddedCount, 300);
 		
 		instance = new MockView();
-		instance.on("added", addedViewHandler);
+		instance.on(View.ADDED, addedViewHandler);
 
 		childInstance = new MockView();
 		var grandChildInstance = new MockView();
@@ -293,7 +293,7 @@ class ViewTest
 		
 		instance = new MockView();
 
-		instance.on("removed", handler);
+		instance.on(View.REMOVED, handler);
 
 		childInstance = new MockView();
 		instance.addChild(childInstance);
@@ -307,7 +307,7 @@ class ViewTest
 		
 		instance = new MockView();
 
-		instance.on("removed", removedViewHandler);
+		instance.on(View.REMOVED, removedViewHandler);
 
 		childInstance = new MockView();
 		var grandChildInstance = new MockView();
